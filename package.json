@@ -49,9 +49,11 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "cross-env": "^5.2.0",
-    "graphql": "^0.13.2",
+    "graphql": "^14.3.1",
     "jest": "^23.6.0",
+    "react": "^16.8.6",
     "react-admin": "^2.3.0",
+    "react-dom": "^16.8.6",
     "rimraf": "^2.6.2",
     "typescript": "^3.0.3"
   }
