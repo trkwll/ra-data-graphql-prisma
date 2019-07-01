@@ -226,7 +226,8 @@ describe('buildVariables', () => {
           title: 'Foo',
           tags: [{ id: 'tags1' }, { id: 'tags2' }],
           keywords: ['keyword1', 'keyword2'],
-          relatedPostsIds: ["relatedPost1", "relatedPost2"]
+          relatedPostsIds: ["relatedPost1", "relatedPost2"],
+          relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost2", name: "postName2" }],
         }
       };
 

@@ -321,17 +321,29 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   Object.keys(params.data).reduce(
     (acc, key) => {
       let data = params.data[key]
+
       if (Array.isArray(data)) {
 
-        let field = key
         // if key finish with Ids, its an array of relation
         if (/Ids$/.test(key)) {
           //we remove Ids form field
-          key = field.replace(/Ids$/, '')
+          key = key.replace(/Ids$/, '')
           //and put id in the array
           data = data.map((id: string) => ({ id }))
         }
 
+
+        let isObject = data.some((entry: any) => typeof entry === 'object')
+
+        if (isObject) {
+          data = data.map((entry: any) => Object.keys(entry)
+            .reduce((obj: any, key: any) => {
+              if (key === 'id') {
+                obj[key] = entry[key]
+              }
+              return obj;
+            }, {}))
+        }
 
         const inputType = findInputFieldForType(
           introspectionResults,
@@ -364,8 +376,6 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           };
         }
 
-
-
         return {
           ...acc,
           data: {
@@ -377,9 +387,9 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
-      if (isObject(params.data[key])) {
+      if (isObject(data)) {
         const fieldsToConnect = buildReferenceField({
-          inputArg: params.data[key],
+          inputArg: data,
           introspectionResults,
           typeName: `${resource.type.name}CreateInput`,
           field: key,
@@ -400,6 +410,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           }
         };
       }
+
 
       // Put id field in a where object
       if (key === 'id' && params.data[key]) {
@@ -422,7 +433,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc,
           data: {
             ...acc.data,
-            [key]: params.data[key]
+            [key]: data
           }
         };
       }
