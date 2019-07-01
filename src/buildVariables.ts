@@ -13,6 +13,7 @@ import getFinalType from './utils/getFinalType';
 import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
 
 import {
+  PRISMA_SET,
   PRISMA_CONNECT,
   PRISMA_DISCONNECT,
   PRISMA_UPDATE
@@ -43,6 +44,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     }
 
     if (Array.isArray(params.filter[key])) {
+
       const type = introspectionResults.types.find(
         t => t.name === `${resource.type.name}WhereInput`
       ) as IntrospectionInputObjectType;
@@ -57,6 +59,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     }
 
     if (isObject(params.filter[key])) {
+
       const type = introspectionResults.types.find(
         t => t.name === `${resource.type.name}WhereInput`
       ) as IntrospectionInputObjectType;
@@ -109,6 +112,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     return { ...acc, [key]: params.filter[key] };
   }, {});
 
+
   return {
     skip: (params.pagination.page - 1) * params.pagination.perPage,
     first: params.pagination.perPage,
@@ -129,6 +133,7 @@ const findInputFieldForType = (
   if (!type) {
     return null;
   }
+  // if field fish with Ids, its an array of relation
 
   const inputFieldType = type.inputFields.find(t => t.name === field);
 
@@ -168,11 +173,11 @@ const buildReferenceField = ({
   );
 
   return Object.keys(inputArg).reduce((acc, key) => {
-    return inputFieldExistsForType(
+    return (inputFieldExistsForType(
       introspectionResults,
       mutationInputType!.name,
       key
-    )
+    ) && key === 'id')
       ? { ...acc, [key]: inputArg[key] }
       : acc;
   }, {});
@@ -189,6 +194,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   aorFetchType: String,
   params: UpdateParams
 ) => {
+
   return Object.keys(params.data).reduce(
     (acc, key) => {
       if (Array.isArray(params.data[key])) {
@@ -202,30 +208,48 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           return acc;
         }
 
-        //TODO: Make connect, disconnect and update overridable
-        //TODO: Make updates working
-        const {
-          fieldsToAdd,
-          fieldsToRemove /* fieldsToUpdate */
-        } = computeFieldsToAddRemoveUpdate(
-          params.previousData[`${key}Ids`],
-          params.data[`${key}Ids`]
+        // if its an array, it can be an array of relation or an array of Scalar
+        // we check the corresponding input in introspectionresult to know if it use "set" or something else
+
+        const hasSetMethod = findInputFieldForType(
+          introspectionResults,
+          inputType.name,
+          'set'
         );
+        if (hasSetMethod) {
+          return {
+            ...acc,
+            data: {
+              ...acc.data,
+              [key]: {
+                [PRISMA_SET]: params.data[key]
+              }
+            }
+          };
+        }
+
+        //if key connect already exist we dont do anything
+        const {
+          fieldsToAdd
+        } = computeFieldsToAddRemoveUpdate(
+          params.previousData[key],
+          params.data[key]
+        );
+
 
         return {
           ...acc,
           data: {
             ...acc.data,
             [key]: {
-              [PRISMA_CONNECT]: fieldsToAdd,
-              [PRISMA_DISCONNECT]: fieldsToRemove
-              //[PRISMA_UPDATE]: fieldsToUpdate
+              [PRISMA_CONNECT]: fieldsToAdd
             }
           }
         };
       }
 
       if (isObject(params.data[key])) {
+
         const fieldsToUpdate = buildReferenceField({
           inputArg: params.data[key],
           introspectionResults,
@@ -259,13 +283,17 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
+
       const type = introspectionResults.types.find(
         t => t.name === resource.type.name
       ) as IntrospectionObjectType;
+
       const isInField = type.fields.find(t => t.name === key);
+
 
       if (!!isInField) {
         // Rest should be put in data object
+
         return {
           ...acc,
           data: {
@@ -284,6 +312,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
 interface CreateParams {
   data: { [key: string]: any };
 }
+
 const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
@@ -291,25 +320,58 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
 ) =>
   Object.keys(params.data).reduce(
     (acc, key) => {
-      if (Array.isArray(params.data[key])) {
-        if (
-          !inputFieldExistsForType(
-            introspectionResults,
-            `${resource.type.name}CreateInput`,
-            key
-          )
-        ) {
+      let data = params.data[key]
+      if (Array.isArray(data)) {
+
+        let field = key
+        // if key finish with Ids, its an array of relation
+        if (/Ids$/.test(key)) {
+          //we remove Ids form field
+          key = field.replace(/Ids$/, '')
+          //and put id in the array
+          data = data.map((id: string) => ({ id }))
+        }
+
+
+        const inputType = findInputFieldForType(
+          introspectionResults,
+          `${resource.type.name}CreateInput`,
+          key
+        );
+        if (!inputType) {
           return acc;
         }
+
+
+        // if its an array, it can be an array of relation or an array of Scalar
+        // we check the corresponding input in introspectionresult to know if it use "set" or something else
+
+        const hasSetMethod = findInputFieldForType(
+          introspectionResults,
+          inputType.name,
+          'set'
+        );
+
+        if (hasSetMethod) {
+          return {
+            ...acc,
+            data: {
+              ...acc.data,
+              [key]: {
+                [PRISMA_SET]: data
+              }
+            }
+          };
+        }
+
+
 
         return {
           ...acc,
           data: {
             ...acc.data,
             [key]: {
-              [PRISMA_CONNECT]: params.data[`${key}Ids`].map((id: string) => ({
-                id
-              }))
+              [PRISMA_CONNECT]: data
             }
           }
         };
@@ -399,11 +461,12 @@ export default (introspectionResults: IntrospectionResult) => (
         where: { id: params.id }
       };
     case UPDATE: {
-      return buildUpdateVariables(introspectionResults)(
+      const variables = buildUpdateVariables(introspectionResults)(
         resource,
         aorFetchType,
         params
       );
+      return variables
     }
 
     case CREATE: {

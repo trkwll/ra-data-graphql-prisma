@@ -88,7 +88,25 @@ describe('buildVariables', () => {
                     name: 'TagCreateManyInput'
                   }
                 }
-              }
+              },
+              {
+                name: 'keywords',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'PostCreateKeywordInput'
+                  }
+                }
+              },
+              {
+                name: 'relatedPosts',
+                type: {
+                  kind: TypeKind.INPUT_OBJECT,
+                  name: 'RelatedPostCreateManyInput',
+                  ofType: null
+                }
+              },
             ]
           },
           {
@@ -148,7 +166,57 @@ describe('buildVariables', () => {
                 }
               }
             ]
-          }
+          },
+          {
+            name: 'PostCreateKeywordInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'set',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.SCALAR,
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'RelatedPostCreateManyInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: "RelatedPostWhereUniqueInput",
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'RelatedPostWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'ID'
+                }
+              }
+            ]
+          },
         ]
       };
 
@@ -157,7 +225,8 @@ describe('buildVariables', () => {
           author: { id: 'author1' },
           title: 'Foo',
           tags: [{ id: 'tags1' }, { id: 'tags2' }],
-          tagsIds: ['tags1', 'tags2']
+          keywords: ['keyword1', 'keyword2'],
+          relatedPostsIds: ["relatedPost1", "relatedPost2"]
         }
       };
 
@@ -172,6 +241,10 @@ describe('buildVariables', () => {
           author: { connect: { id: 'author1' } },
           tags: {
             connect: [{ id: 'tags1' }, { id: 'tags2' }]
+          },
+          keywords: { set: ['keyword1', 'keyword2'] },
+          relatedPosts: {
+            connect: [{ id: "relatedPost1" }, { id: "relatedPost2" }]
           },
           title: 'Foo'
         }
@@ -210,7 +283,17 @@ describe('buildVariables', () => {
                     name: 'TagsUpdateManyInput'
                   }
                 }
-              }
+              },
+              {
+                name: 'keywords',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'PostUpdateKeywordInput'
+                  }
+                }
+              },
             ]
           },
           {
@@ -240,6 +323,24 @@ describe('buildVariables', () => {
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
                     name: 'TagsWhereUniqueInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'PostUpdateKeywordInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'set',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.SCALAR,
+                    }
                   }
                 }
               }
@@ -277,14 +378,14 @@ describe('buildVariables', () => {
       const params = {
         data: {
           id: 'postId',
-          tags: [{ id: 'tags1' }, { id: 'tags2' }],
-          tagsIds: ['tags1', 'tags2'],
-          author: { id: 'author1' },
+          tags: [{ id: 'tags1', code: 'tags1code' }, { id: 'tags2', code: 'tags2scode' }],
+          keywords: ['keyword1', 'keyword2'],
+          author: { id: 'author1', name: 'author1name' },
           title: 'Foo'
         },
         previousData: {
-          tags: [{ id: 'tags1' }],
-          tagsIds: ['tags1']
+          tags: [{ id: 'tags1' }, { id: 'tags3' }],
+          keywords: ['keyword1']
         }
       };
 
@@ -299,9 +400,9 @@ describe('buildVariables', () => {
         data: {
           author: { connect: { id: 'author1' } },
           tags: {
-            connect: [{ id: 'tags2' }],
-            disconnect: []
+            connect: [{ id: 'tags1' }, { id: 'tags2' }],
           },
+          keywords: { set: ['keyword1', 'keyword2'] },
           title: 'Foo'
         }
       });

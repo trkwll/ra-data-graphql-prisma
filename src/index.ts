@@ -48,7 +48,7 @@ export default (options: {
 }) => {
   return buildDataProvider(merge({}, defaultOptions, options)).then(
     graphQLDataProvider => {
-      return (
+      return async (
         fetchType: string,
         resource: string,
         params: { [key: string]: any }
@@ -81,7 +81,8 @@ export default (options: {
             return { data: results.map(({ data }: any) => data.id) };
           });
         }
-        return graphQLDataProvider(fetchType, resource, params);
+        const res = await graphQLDataProvider(fetchType, resource, params);
+        return res
       };
     }
   );

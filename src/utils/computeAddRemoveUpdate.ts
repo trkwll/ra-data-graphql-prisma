@@ -4,8 +4,9 @@ type ID = string;
 
 const formatId = (id: ID) => ({ id });
 
-export const computeFieldsToAdd = (oldIds: ID[], newIds: ID[]) => {
-  return difference(newIds, oldIds).map(formatId);
+export const computeFieldsToAdd = (oldIds: [], newIds: []) => {
+  let id = newIds.map((v: { id: string }) => v.id)
+  return difference(id, oldIds).map(formatId);
 };
 
 export const computeFieldsToRemove = (oldIds: ID[], newIds: ID[]) => {
@@ -16,7 +17,7 @@ export const computeFieldsToUpdate = (oldIds: ID[], newIds: ID[]) => {
   return oldIds.filter(oldId => newIds.includes(oldId)).map(formatId);
 };
 
-export const computeFieldsToAddRemoveUpdate = (oldIds: ID[], newIds: ID[]) => ({
+export const computeFieldsToAddRemoveUpdate = (oldIds: [], newIds: []) => ({
   fieldsToAdd: computeFieldsToAdd(oldIds, newIds),
   fieldsToRemove: computeFieldsToRemove(oldIds, newIds),
   fieldsToUpdate: computeFieldsToUpdate(oldIds, newIds)

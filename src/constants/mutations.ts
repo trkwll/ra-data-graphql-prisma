@@ -1,3 +1,4 @@
+export const PRISMA_SET = 'set';
 export const PRISMA_CONNECT = 'connect';
 export const PRISMA_DISCONNECT = 'disconnect';
 export const PRISMA_CREATE = 'create';

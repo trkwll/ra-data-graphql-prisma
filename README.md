@@ -1,6 +1,6 @@
-# ra-data-opencrud
+# ra-data-graphql-prisma
 
-*Prisma on steroids*: easily build backoffices with Prisma/GraphCMS plugged on `react-admin`!
+`react-admin` data provider for Prisma
 
 ### Work in progress
 If you wanna give it a try anyway, here's a quick preview on codesandbox.

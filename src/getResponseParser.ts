@@ -48,8 +48,8 @@ const sanitizeResource = (
           : undefined,
         [field.name]: linkedResourceData
           ? sanitizeResource(introspectionResults, linkedResource)(
-              data[field.name]
-            )
+            data[field.name]
+          )
           : undefined
       };
     }
