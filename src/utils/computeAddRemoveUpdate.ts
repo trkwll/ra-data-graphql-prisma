@@ -5,12 +5,15 @@ type ID = string;
 const formatId = (id: ID) => ({ id });
 
 export const computeFieldsToAdd = (oldIds: [], newIds: []) => {
-  let id = newIds.map((v: { id: string }) => v.id)
-  return difference(id, oldIds).map(formatId);
+  let idsNew = newIds.map((v: { id: string }) => v.id);
+  return difference(idsNew, oldIds).map(formatId);
 };
 
-export const computeFieldsToRemove = (oldIds: ID[], newIds: ID[]) => {
-  return difference(oldIds, newIds).map(formatId);
+export const computeFieldsToRemove = (oldIds: [], newIds: []) => {
+
+  let idsOld = oldIds.map((v: { id: string }) => v.id);
+
+  return difference(idsOld, newIds).map(formatId);
 };
 
 export const computeFieldsToUpdate = (oldIds: ID[], newIds: ID[]) => {

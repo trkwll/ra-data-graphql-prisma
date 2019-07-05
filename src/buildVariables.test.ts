@@ -295,6 +295,14 @@ describe('buildVariables', () => {
                   }
                 }
               },
+              {
+                name: 'relatedPosts',
+                type: {
+                  kind: TypeKind.INPUT_OBJECT,
+                  name: 'RelatedPostUpdateManyInput',
+                  ofType: null
+                }
+              },
             ]
           },
           {
@@ -348,6 +356,38 @@ describe('buildVariables', () => {
             ]
           },
           {
+            name: 'RelatedPostUpdateManyInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: "RelatedPostWhereUniqueInput",
+                    }
+                  }
+                }
+              },
+              {
+                name: 'disconnect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: "RelatedPostWhereUniqueInput",
+                    }
+                  }
+                },
+              },
+            ]
+          },
+          {
             name: 'TagsWhereUniqueInput',
             kind: TypeKind.INPUT_OBJECT,
             inputFields: [
@@ -372,7 +412,20 @@ describe('buildVariables', () => {
                 }
               }
             ]
-          }
+          },
+          {
+            name: 'RelatedPostWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'ID'
+                }
+              }
+            ]
+          },
         ]
       };
 
@@ -382,11 +435,15 @@ describe('buildVariables', () => {
           tags: [{ id: 'tags1', code: 'tags1code' }, { id: 'tags2', code: 'tags2scode' }],
           keywords: ['keyword1', 'keyword2'],
           author: { id: 'author1', name: 'author1name' },
+          relatedPostsIds: ["relatedPost4", "relatedPost2"],
+          relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost2", name: "postName2" }],
           title: 'Foo'
         },
         previousData: {
           tags: [{ id: 'tags1' }, { id: 'tags3' }],
-          keywords: ['keyword1']
+          keywords: ['keyword1'],
+          relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost3", name: "postName3" }],
+          relatedPostsIds: ["relatedPost1", "relatedPost3"],
         }
       };
 
@@ -402,8 +459,13 @@ describe('buildVariables', () => {
           author: { connect: { id: 'author1' } },
           tags: {
             connect: [{ id: 'tags1' }, { id: 'tags2' }],
+            disconnect: [{ id: "tags1" }, { id: "tags3" }]
           },
           keywords: { set: ['keyword1', 'keyword2'] },
+          relatedPosts: {
+            connect: [{ id: "relatedPost1" }, { id: "relatedPost2" }],
+            disconnect: [{ id: "relatedPost1" }, { id: "relatedPost3" }]
+          },
           title: 'Foo'
         }
       });
