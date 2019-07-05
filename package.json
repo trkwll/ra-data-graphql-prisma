@@ -1,6 +1,6 @@
 {
   "name": "ra-data-graphql-prisma",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Prisma data provider for react-admin based on ra-data-opencrud",
   "main": "dist/index.js",
   "sideEffects": false,
