@@ -173,7 +173,7 @@ const buildReferenceField = ({
   );
 
   return Object.keys(inputArg).reduce((acc, key) => {
-    return (inputFieldExistsForType(
+    return ((Object.keys(acc).length === 0) && inputFieldExistsForType(
       introspectionResults,
       mutationInputType!.name,
       key

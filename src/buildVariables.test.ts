@@ -269,7 +269,7 @@ describe('buildVariables', () => {
       const params = {
         data: {
           author: { id: 'author1', name: "author1name" },
-          editor: { ref: 'editor1code', name: "editor1name" },
+          editor: { ref: 'editor1code', code: "editor1name" },
           title: 'Foo',
           tags: [{ id: 'tags1' }, { id: 'tags2' }],
           keywords: ['keyword1', 'keyword2'],
@@ -324,6 +324,16 @@ describe('buildVariables', () => {
                 }
               },
               {
+                name: 'editor',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'EditorUpdateOneInput'
+                  }
+                }
+              },
+              {
                 name: 'tags',
                 type: {
                   kind: TypeKind.NON_NULL,
@@ -364,6 +374,22 @@ describe('buildVariables', () => {
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
                     name: 'AuthorWhereUniqueInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'EditorUpdateOneInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'EditorWhereUniqueInput'
                   }
                 }
               }
@@ -462,6 +488,26 @@ describe('buildVariables', () => {
             ]
           },
           {
+            name: 'EditorWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'ref',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              },
+              {
+                name: 'code',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          },
+          {
             name: 'RelatedPostWhereUniqueInput',
             kind: TypeKind.INPUT_OBJECT,
             inputFields: [
@@ -483,6 +529,7 @@ describe('buildVariables', () => {
           tags: [{ id: 'tags1', code: 'tags1code' }, { id: 'tags2', code: 'tags2scode' }],
           keywords: ['keyword1', 'keyword2'],
           author: { id: 'author1', name: 'author1name' },
+          editor: { ref: 'editor1code', code: "editor1name" },
           relatedPostsIds: ["relatedPost4", "relatedPost2"],
           relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost2", name: "postName2" }],
           title: 'Foo'
@@ -490,6 +537,7 @@ describe('buildVariables', () => {
         previousData: {
           tags: [{ id: 'tags1' }, { id: 'tags3' }],
           keywords: ['keyword1'],
+          editor: { ref: 'editor2code', code: "editor2name" },
           relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost3", name: "postName3" }],
           relatedPostsIds: ["relatedPost1", "relatedPost3"],
         }
@@ -505,6 +553,7 @@ describe('buildVariables', () => {
         where: { id: 'postId' },
         data: {
           author: { connect: { id: 'author1' } },
+          editor: { connect: { ref: 'editor1code' } },
           tags: {
             connect: [{ id: 'tags1' }, { id: 'tags2' }],
             disconnect: [{ id: "tags1" }, { id: "tags3" }]
