@@ -177,7 +177,7 @@ const buildReferenceField = ({
       introspectionResults,
       mutationInputType!.name,
       key
-    ) && key === 'id')
+    ))
       ? { ...acc, [key]: inputArg[key] }
       : acc;
   }, {});
@@ -195,7 +195,6 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   params: UpdateParams
 ) => Object.keys(params.data).reduce(
   (acc, key) => {
-    console.log(key)
     let data = params.data[key]
 
     if (Array.isArray(data)) {
@@ -208,8 +207,6 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         data = data.map((id: string) => ({ id }))
       }
 
-
-      console.log(key, 'is array')
       const inputType = findInputFieldForType(
         introspectionResults,
         `${resource.type.name}UpdateInput`,
@@ -261,7 +258,6 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         }
       };
     }
-    console.log(key, 'is not array')
     if (isObject(data)) {
 
       const fieldsToUpdate = buildReferenceField({
@@ -334,7 +330,6 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   Object.keys(params.data).reduce(
     (acc, key) => {
       let data = params.data[key]
-
       if (Array.isArray(data)) {
 
         // if key finish with Ids, its an array of relation
@@ -407,7 +402,6 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           field: key,
           mutationType: PRISMA_CONNECT
         });
-
         // If no fields in the object are valid, continue
         if (Object.keys(fieldsToConnect).length === 0) {
           return acc;

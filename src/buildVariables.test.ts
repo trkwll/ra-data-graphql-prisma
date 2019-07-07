@@ -80,6 +80,16 @@ describe('buildVariables', () => {
                 }
               },
               {
+                name: 'editor',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'EditorCreateOneInput'
+                  }
+                }
+              },
+              {
                 name: 'tags',
                 type: {
                   kind: TypeKind.NON_NULL,
@@ -136,6 +146,42 @@ describe('buildVariables', () => {
                   name: 'String'
                 }
               }
+            ]
+          },
+          {
+            name: 'EditorCreateOneInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'EditorWhereUniqueInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'EditorWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              },
+              {
+                name: 'ref',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              },
             ]
           },
           {
@@ -222,7 +268,8 @@ describe('buildVariables', () => {
 
       const params = {
         data: {
-          author: { id: 'author1' },
+          author: { id: 'author1', name: "author1name" },
+          editor: { ref: 'editor1code', name: "editor1name" },
           title: 'Foo',
           tags: [{ id: 'tags1' }, { id: 'tags2' }],
           keywords: ['keyword1', 'keyword2'],
@@ -240,6 +287,7 @@ describe('buildVariables', () => {
       ).toEqual({
         data: {
           author: { connect: { id: 'author1' } },
+          editor: { connect: { ref: 'editor1code' } },
           tags: {
             connect: [{ id: 'tags1' }, { id: 'tags2' }]
           },
