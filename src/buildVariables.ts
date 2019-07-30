@@ -196,15 +196,17 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
 ) => Object.keys(params.data).reduce(
   (acc, key) => {
     let data = params.data[key]
-
+    let previousData = params.previousData[key]
     if (Array.isArray(data)) {
 
       // if key finish with Ids, its an array of relation
       if (/Ids$/.test(key)) {
+        previousData = params.previousData[key].map((id: string) => ({ id }))
         //we remove Ids form field
         key = key.replace(/Ids$/, '')
         //and put id in the array
         data = data.map((id: string) => ({ id }))
+
       }
 
       const inputType = findInputFieldForType(
@@ -242,11 +244,9 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         fieldsToAdd,
         fieldsToRemove
       } = computeFieldsToAddRemoveUpdate(
-        params.previousData[key],
+        previousData,
         data
       );
-
-
       return {
         ...acc,
         data: {

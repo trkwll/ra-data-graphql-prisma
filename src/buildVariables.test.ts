@@ -530,7 +530,7 @@ describe('buildVariables', () => {
           keywords: ['keyword1', 'keyword2'],
           author: { id: 'author1', name: 'author1name' },
           editor: { ref: 'editor1code', code: "editor1name" },
-          relatedPostsIds: ["relatedPost4", "relatedPost2"],
+          relatedPostsIds: ["relatedPost1", "relatedPost2"],
           relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost2", name: "postName2" }],
           title: 'Foo'
         },
@@ -555,13 +555,13 @@ describe('buildVariables', () => {
           author: { connect: { id: 'author1' } },
           editor: { connect: { ref: 'editor1code' } },
           tags: {
-            connect: [{ id: 'tags1' }, { id: 'tags2' }],
-            disconnect: [{ id: "tags1" }, { id: "tags3" }]
+            connect: [{ id: 'tags2' }],
+            disconnect: [{ id: "tags3" }]
           },
           keywords: { set: ['keyword1', 'keyword2'] },
           relatedPosts: {
-            connect: [{ id: "relatedPost1" }, { id: "relatedPost2" }],
-            disconnect: [{ id: "relatedPost1" }, { id: "relatedPost3" }]
+            connect: [{ id: "relatedPost2" }],
+            disconnect: [{ id: "relatedPost3" }]
           },
           title: 'Foo'
         }
