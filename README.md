@@ -18,22 +18,33 @@ Be aware that it might not be working because of that, or that performances may 
 - [Tips and workflow](#tips-and-workflow)
 - [Contributing](#contributing)
 
-## What is react admin ? And what's ra-data-opencrud ?
+## What is react admin ? And what's ra-data-graphql-prisma ?
 
 [Find out more about the benefits of using `react-admin` with Prisma here.](context.md) 
+
+Prisma V1 offers a full graphQL CRUD Server out of the box. This module allows to use react-admin directly on Prisma Server.
+
+This module is a fork of `ra-data-opencrud`. 
+
+Since `ra-data-opencrud` maintainer focus on the future of back-end development with Prisma Framework (v2) and nexus-prisma, this fork allow us to maintain and fix some part of the module.
+
+While the original module goal was to follow the `opencrud` specification, this fork mostly focus on Prisma 1. The module should however with other server following the opencrud convention.
+
+This module is not compatible with Prisma (2) Framework & nexus-prisma.
+
 
 ## Installation
 
 Install with:
 
 ```sh
-npm install --save graphql ra-data-opencrud
+npm install --save graphql ra-data-graphql-prisma
 ```
 
 or
 
 ```sh
-yarn add graphql ra-data-opencrud
+yarn add graphql ra-data-graphql-prisma
 ```
 
 ## Usage
@@ -43,7 +54,7 @@ This example assumes a `Post` type is defined in your datamodel.
 ```js
 // in App.js
 import React, { Component } from 'react';
-import buildOpenCrudProvider from 'ra-data-opencrud';
+import buildOpenCrudProvider from 'ra-data-graphql-prisma';
 import { Admin, Resource, Delete } from 'react-admin';
 
 import { PostCreate, PostEdit, PostList } from './posts';
@@ -82,6 +93,16 @@ And that's it, `buildOpenCrudProvider` will create a default ApolloClient for yo
 
 ## Options
 
+### Relation and references
+
+In order to link to reference record using ReferenceField or ReferenceInput, `ra-data-graphql-prisma` uses a object notation (instead of snake_case or camelCase as seen in the react-admin documentation)
+
+```js
+<ReferenceInput source="company.id" reference="Company">
+    <SelectInput optionText="id" />
+</ReferenceInput>
+```
+
 ### Customize the Apollo client
 
 You can either supply the client options by calling `buildOpenCrudProvider` like this:
@@ -104,7 +125,7 @@ The default behavior might not be optimized especially when dealing with referen
 
 ```js
 // in src/dataProvider.js
-import buildOpenCrudProvider, { buildQuery } from 'ra-data-opencrud';
+import buildOpenCrudProvider, { buildQuery } from 'ra-data-graphql-prisma';
 
 const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     const builtQuery = buildQuery(introspection)(fetchType, resource, params);
@@ -143,7 +164,7 @@ You can also override a query using the same API `graphql-binding` offers.
 
 ```js
 // in src/dataProvider.js
-import buildOpenCrudProvider, { buildQuery } from 'ra-data-opencrud';
+import buildOpenCrudProvider, { buildQuery } from 'ra-data-graphql-prisma';
 
 const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     if (resource === 'Command' && fetchType === 'GET_ONE') {
@@ -209,7 +230,7 @@ buildApolloProvider({ introspection: introspectionOptions });
 ### Performance issues
 As react-admin was originally made for REST endpoints, it cannot always take full advantage of GraphQL's benefits.
 
-Although `react-admin` already has a load of bult-in optimizations ([Read more here](marmelab.com/blog/2016/10/18/using-redux-saga-to-deduplicate-and-group-actions.html) and [here](https://github.com/marmelab/react-admin/issues/2243)),
+Although `react-admin` already has a load of built-in optimizations ([Read more here](marmelab.com/blog/2016/10/18/using-redux-saga-to-deduplicate-and-group-actions.html) and [here](https://github.com/marmelab/react-admin/issues/2243)),
 it is not yet well suited when fetching n-to-many relations (multiple requests will be sent).
 
 To counter that limitation, as shown above, you can override queries to directly provide all the fields that you will need to display your view.
@@ -226,16 +247,16 @@ As overriding all queries can be cumbersome, **this should be done progressively
 
 ## Contributing
 
-Use the example under `examples/prisma-ecommerce` as a playground for improving `ra-data-opencrud`.
+Use the example under `examples/prisma-ecommerce` as a playground for improving `ra-data-graphql-prisma`.
 
-To easily enhance `ra-data-opencrud` and get the changes reflected on `examples/prisma-ecommerce`, do the following:
+To easily enhance `ra-data-graphql-prisma` and get the changes reflected on `examples/prisma-ecommerce`, do the following:
 
-- `cd ra-data-opencrud`
+- `cd ra-data-graphql-prisma`
 - `yarn link`
 - `cd examples/prisma-ecommerce`
-- `yarn link ra-data-opencrud`
+- `yarn link ra-data-graphql-prisma`
 
-Once this is done, the `ra-data-opencrud` dependency will be replaced by the one on the repository.
+Once this is done, the `ra-data-graphql-prisma` dependency will be replaced by the one on the repository.
 **One last thing, don't forget to transpile the library with babel by running the following command on the root folder**
 
 
