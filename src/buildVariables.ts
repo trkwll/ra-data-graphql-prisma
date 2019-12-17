@@ -8,6 +8,7 @@ import {
   DELETE
 } from 'react-admin';
 import isObject from 'lodash/isObject';
+import isDate from 'lodash/isDate';
 
 import getFinalType from './utils/getFinalType';
 import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
@@ -258,7 +259,8 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         }
       };
     }
-    if (isObject(data)) {
+
+    if (isObject(data) && !isDate(data)) {
 
       const fieldsToUpdate = buildReferenceField({
         inputArg: data,
@@ -394,7 +396,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
-      if (isObject(data)) {
+      if (isObject(data) && !isDate(data)) {
         const fieldsToConnect = buildReferenceField({
           inputArg: data,
           introspectionResults,
