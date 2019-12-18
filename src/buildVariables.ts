@@ -342,7 +342,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           data = data.map((id: string) => ({ id }))
         }
 
-        let isObject = data.some((entry: any) => typeof entry === 'object')
+        let isObject = data.some((entry: any) => isObject(entry) && !isDate(entry))
 
         if (isObject) {
           data = data.map((entry: any) => Object.keys(entry)
