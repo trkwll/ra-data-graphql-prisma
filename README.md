@@ -103,6 +103,9 @@ In order to link to reference record using ReferenceField or ReferenceInput, `ra
 </ReferenceInput>
 ```
 
+Exception :
+The reference in a ReferenceArrayField is with camelCase : this field has not been managed yet.
+
 ### Customize the Apollo client
 
 You can either supply the client options by calling `buildOpenCrudProvider` like this:
