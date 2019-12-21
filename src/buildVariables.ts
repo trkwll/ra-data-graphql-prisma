@@ -342,9 +342,9 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           data = data.map((id: string) => ({ id }))
         }
 
-        let isObject = data.some((entry: any) => isObject(entry) && !isDate(entry))
+        let entryIsObject = data.some((entry: any) => isObject(entry) && !isDate(entry))
 
-        if (isObject) {
+        if (entryIsObject) {
           data = data.map((entry: any) => Object.keys(entry)
             .reduce((obj: any, key: any) => {
               if (key === 'id') {
