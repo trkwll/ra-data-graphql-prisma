@@ -272,3 +272,15 @@ You should now be good to go ! Run the tests with this command:
 ```sh
 jest
 ```
+### Known issues
+
+#### Yarn install error on fsevent
+
+When installing a local environment using yarn and a node version > 10, a problem might occurs while installing some dependencies (fsevent).
+Running the following command appears to fix the problem
+
+```sh
+yarn cache clean && yarn upgrade && yarn
+```
+
+Related issues : https://github.com/yarnpkg/yarn/issues/3926
