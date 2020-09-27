@@ -69,11 +69,12 @@ export default (options: {
         }
 
         if (fetchType === UPDATE_MANY) {
-          const { ids, ...otherParams } = params;
+          const { ids, data, ...otherParams } = params;
           return Promise.all(
             params.ids.map((id: string) =>
               graphQLDataProvider(UPDATE, resource, {
                 id,
+                data: { id, ...data },
                 ...otherParams
               })
             )
@@ -82,7 +83,7 @@ export default (options: {
           });
         }
         const res = await graphQLDataProvider(fetchType, resource, params);
-        return res
+        return res;
       };
     }
   );
