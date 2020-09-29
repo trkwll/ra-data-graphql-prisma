@@ -1,12 +1,16 @@
 {
-  "name": "ra-data-graphql-prisma",
+  "name": "@trkwll/ra-data-graphql-prisma",
   "version": "0.0.11",
   "description": "A react-admin data provider for Prisma Server",
   "main": "dist/index.js",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marcantoine/ra-data-graphql-prisma.git"
+    "url": "git://github.com/trkwll/ra-data-graphql-prisma.git"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   },
   "bugs": {
     "url": "https://github.com/marcantoine/ra-data-graphql-prisma/issues"
@@ -26,7 +30,7 @@
     "prisma",
     "graphcms"
   ],
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch"
