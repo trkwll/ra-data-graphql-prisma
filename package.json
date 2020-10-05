@@ -9,7 +9,7 @@
     "url": "git://github.com/trkwll/ra-data-graphql-prisma.git"
   },
   "publishConfig": {
-    "access": "restricted",
+    "access": "public",
     "registry": "https://npm.pkg.github.com"
   },
   "bugs": {
