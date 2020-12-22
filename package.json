@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "graphql-tag": "^2.6.1",
-    "lodash": "~4.17.5",
+    "lodash": "~4.17.19",
     "pluralize": "^7.0.0",
     "ra-data-graphql": "^2.3.0"
   },
