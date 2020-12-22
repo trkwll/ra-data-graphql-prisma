@@ -25,58 +25,55 @@ export interface Query {
 }
 
 export const buildFields = (introspectionResults: IntrospectionResult) => (
-  fields: IntrospectionField[]
+  fields: ReadonlyArray<IntrospectionField>
 ): FieldNode[] => {
-  return fields.reduce(
-    (acc: FieldNode[], field) => {
-      const type = getFinalType(field.type);
+  return fields.reduce((acc: FieldNode[], field) => {
+    const type = getFinalType(field.type);
 
-      if (type.name.startsWith('_')) {
-        return acc;
-      }
-
-      if (type.kind !== TypeKind.OBJECT) {
-        return [...acc, gqlTypes.field(gqlTypes.name(field.name))];
-      }
-
-      const linkedResource = introspectionResults.resources.find(
-        r => r.type.name === type.name
-      );
-
-      if (linkedResource) {
-        return [
-          ...acc,
-          gqlTypes.field(gqlTypes.name(field.name), {
-            selectionSet: gqlTypes.selectionSet([
-              gqlTypes.field(gqlTypes.name('id'))
-            ])
-          })
-        ];
-      }
-
-      const linkedType = introspectionResults.types.find(
-        t => t.name === type.name
-      );
-
-      if (linkedType) {
-        return [
-          ...acc,
-          gqlTypes.field(gqlTypes.name(field.name), {
-            selectionSet: gqlTypes.selectionSet(
-              buildFields(introspectionResults)(
-                (linkedType as IntrospectionObjectType).fields
-              )
-            )
-          })
-        ];
-      }
-
-      // NOTE: We might have to handle linked types which are not resources but will have to be careful about
-      // ending with endless circular dependencies
+    if (type.name.startsWith('_')) {
       return acc;
-    },
-    [] as FieldNode[]
-  );
+    }
+
+    if (type.kind !== TypeKind.OBJECT) {
+      return [...acc, gqlTypes.field(gqlTypes.name(field.name))];
+    }
+
+    const linkedResource = introspectionResults.resources.find(
+      r => r.type.name === type.name
+    );
+
+    if (linkedResource) {
+      return [
+        ...acc,
+        gqlTypes.field(gqlTypes.name(field.name), {
+          selectionSet: gqlTypes.selectionSet([
+            gqlTypes.field(gqlTypes.name('id'))
+          ])
+        })
+      ];
+    }
+
+    const linkedType = introspectionResults.types.find(
+      t => t.name === type.name
+    );
+
+    if (linkedType) {
+      return [
+        ...acc,
+        gqlTypes.field(gqlTypes.name(field.name), {
+          selectionSet: gqlTypes.selectionSet(
+            buildFields(introspectionResults)(
+              (linkedType as IntrospectionObjectType).fields
+            )
+          )
+        })
+      ];
+    }
+
+    // NOTE: We might have to handle linked types which are not resources but will have to be careful about
+    // ending with endless circular dependencies
+    return acc;
+  }, [] as FieldNode[]);
 };
 
 export const getArgType = (arg: IntrospectionField) => {
@@ -176,9 +173,7 @@ const buildFieldsFromFragment = (
       parsedFragment = parse(fragment);
     } catch (e) {
       throw new Error(
-        `Invalid fragment given for resource '${resourceName}' and fetchType '${fetchType}' (${
-          e.message
-        }).`
+        `Invalid fragment given for resource '${resourceName}' and fetchType '${fetchType}' (${e.message}).`
       );
     }
   }

@@ -90,7 +90,7 @@ describe('buildArgs', () => {
       print(
         buildArgs({ args: [{ name: 'foo' }, { name: 'bar' }] } as Query, {
           foo: 'foo_value'
-        })
+        }) as any
       )
     ).toEqual(['foo: $foo']);
   });
@@ -98,7 +98,7 @@ describe('buildArgs', () => {
 
 describe('buildApolloArgs', () => {
   it('returns an empty array when query does not have any arguments', () => {
-    expect(print(buildApolloArgs({ args: [] }))).toEqual([]);
+    expect(print(buildApolloArgs({ args: [] }) as any)).toEqual([]);
   });
 
   it('returns an array of args correctly filtered when query has arguments', () => {
@@ -138,7 +138,7 @@ describe('buildApolloArgs', () => {
             ]
           } as Query,
           { foo: 'foo_value', barId: 100, barIds: [101, 102] }
-        )
+        ) as any
       )
     ).toEqual(['$foo: Int!', '$barId: ID', '$barIds: [ID!]']);
   });
@@ -179,7 +179,9 @@ describe('buildFields', () => {
 
     expect(
       print(
-        buildFields(introspectionResults as IntrospectionResult)(fields as any)
+        buildFields((introspectionResults as unknown) as IntrospectionResult)(
+          fields as any
+        ) as any
       )
     ).toEqual([
       'id',
@@ -252,8 +254,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for GET_LIST', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           GET_LIST,
           queryType as Query,
           params,
@@ -283,8 +285,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for GET_MANY', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           GET_MANY,
           queryType as Query,
           params,
@@ -314,8 +316,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for GET_MANY_REFERENCE', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           GET_MANY_REFERENCE,
           queryType as Query,
           params,
@@ -345,8 +347,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for GET_ONE', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           GET_ONE,
           { ...queryType, name: 'getCommand' } as Query,
           params,
@@ -371,8 +373,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for UPDATE', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           UPDATE,
           { ...queryType, name: 'updateCommand' } as Query,
           params,
@@ -397,8 +399,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for CREATE', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           CREATE,
           { ...queryType, name: 'createCommand' } as Query,
           params,
@@ -423,8 +425,8 @@ describe('buildGqlQuery', () => {
   it('returns the correct query for DELETE', () => {
     expect(
       print(
-        buildGqlQuery(introspectionResults as IntrospectionResult)(
-          resource as Resource,
+        buildGqlQuery((introspectionResults as unknown) as IntrospectionResult)(
+          (resource as unknown) as Resource,
           DELETE,
           { ...queryType, name: 'deleteCommand' } as Query,
           params,
