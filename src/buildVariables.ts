@@ -18,7 +18,8 @@ import {
   PRISMA_CONNECT,
   PRISMA_DISCONNECT,
   PRISMA_UPDATE,
-  PRISMA_DELETE
+  PRISMA_DELETE,
+  PRISMA_CREATE
 } from './constants/mutations';
 import {
   IntrospectionInputObjectType,
@@ -238,17 +239,21 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
       }
 
       //if key connect already exist we dont do anything
-      const { fieldsToAdd, fieldsToRemove } = computeFieldsToAddRemoveUpdate(
-        previousData,
-        data
-      );
+      const {
+        fieldsToAdd,
+        fieldsToRemove,
+        fieldsToUpdate,
+        fieldsToCreate
+      } = computeFieldsToAddRemoveUpdate(previousData, data);
       return {
         ...acc,
         data: {
           ...acc.data,
           [key]: {
             [PRISMA_CONNECT]: fieldsToAdd,
-            [PRISMA_DISCONNECT]: fieldsToRemove
+            [PRISMA_DISCONNECT]: fieldsToRemove,
+            [PRISMA_UPDATE]: fieldsToUpdate,
+            [PRISMA_CREATE]: fieldsToCreate
           }
         }
       };
@@ -346,20 +351,20 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         data = data.map((id: string) => ({ id }));
       }
 
-      let entryIsObject = data.some(
-        (entry: any) => isObject(entry) && !isDate(entry)
-      );
+      // let entryIsObject = data.some(
+      //   (entry: any) => isObject(entry) && !isDate(entry)
+      // );
 
-      if (entryIsObject) {
-        data = data.map((entry: any) =>
-          Object.keys(entry).reduce((obj: any, key: any) => {
-            if (key === 'id') {
-              obj[key] = entry[key];
-            }
-            return obj;
-          }, {})
-        );
-      }
+      // if (entryIsObject) {
+      //   data = data.map((entry: any) =>
+      //     Object.keys(entry).reduce((obj: any, key: any) => {
+      //       if (key === 'id') {
+      //         obj[key] = entry[key];
+      //       }
+      //       return obj;
+      //     }, {})
+      //   );
+      // }
 
       const inputType = findInputFieldForType(
         introspectionResults,
@@ -391,12 +396,18 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
+      const { fieldsToAdd, fieldsToCreate } = computeFieldsToAddRemoveUpdate(
+        [],
+        data
+      );
+
       return {
         ...acc,
         data: {
           ...acc.data,
           [key]: {
-            [PRISMA_CONNECT]: data
+            [PRISMA_CONNECT]: fieldsToAdd,
+            [PRISMA_CREATE]: fieldsToCreate
           }
         }
       };
