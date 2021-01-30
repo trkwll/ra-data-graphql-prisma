@@ -726,6 +726,103 @@ describe('buildVariables', () => {
         }
       });
     });
+
+    it('updates UserMeta correctly', () => {
+      const introspectionResult = {
+        types: [
+          {
+            name: 'User',
+            fields: [{ name: 'name' }, { name: 'meta' }]
+          },
+          {
+            name: 'UserMeta',
+            fields: [{ name: 'bio' }, { name: 'dob' }]
+          },
+          {
+            name: 'UserUpdateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'meta',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'UserMetaUpdateOneInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'UserMetaUpdateOneInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'update',
+                type: {
+                  kind: TypeKind.INPUT_OBJECT,
+                  name: 'UserMetaUpdateDataInput'
+                }
+              }
+            ]
+          },
+          {
+            name: 'UserMetaUpdateDataInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'bio',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              },
+              {
+                name: 'dob',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          }
+        ]
+      };
+
+      const params = {
+        data: {
+          id: 'user1',
+          name: 'John Smith',
+          meta: {
+            id: 'userMeta1',
+            bio: 'foobar',
+            dob: '1993-01-01'
+          }
+        },
+        previousData: {
+          id: 'user1',
+          name: 'John',
+          meta: { id: 'userMeta1' }
+        }
+      };
+
+      expect(
+        buildVariables((introspectionResult as unknown) as IntrospectionResult)(
+          { type: { name: 'User' } } as Resource,
+          UPDATE,
+          params
+        )
+      ).toEqual({
+        where: { id: 'user1' },
+        data: {
+          name: 'John Smith',
+          meta: {
+            update: { bio: 'foobar', dob: '1993-01-01' }
+          }
+        }
+      });
+    });
   });
 
   describe('GET_MANY', () => {

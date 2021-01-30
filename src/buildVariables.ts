@@ -25,7 +25,8 @@ import {
   IntrospectionInputObjectType,
   IntrospectionObjectType,
   IntrospectionType,
-  IntrospectionNamedTypeRef
+  IntrospectionNamedTypeRef,
+  isIntrospectionType
 } from 'graphql';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
@@ -260,6 +261,32 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
     }
 
     if (isObject(data) && !isDate(data)) {
+      if (resource.type.name === 'User' && key === 'meta') {
+        const { data: dataToUpdate } = buildUpdateVariables(
+          introspectionResults
+        )(
+          {
+            type: { name: 'UserMeta' }
+          } as Resource,
+          aorFetchType,
+          {
+            id: (data as any).id,
+            data,
+            previousData
+          }
+        );
+
+        return {
+          ...acc,
+          data: {
+            ...acc.data,
+            [key]: {
+              [PRISMA_UPDATE]: { ...dataToUpdate }
+            }
+          }
+        };
+      }
+
       const fieldsToUpdate = buildReferenceField({
         inputArg: data,
         introspectionResults,
