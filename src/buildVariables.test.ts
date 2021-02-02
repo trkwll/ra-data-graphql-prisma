@@ -303,7 +303,7 @@ describe('buildVariables', () => {
           relatedPosts: [
             { id: 'relatedPost1', name: 'postName1' },
             { id: 'relatedPost2', name: 'postName2' },
-            { name: 'postName3' }
+            { name: 'postName3', thisShouldBeRemoved: null }
           ]
         }
       };
@@ -476,6 +476,16 @@ describe('buildVariables', () => {
                     name: 'TagsWhereUniqueInput'
                   }
                 }
+              },
+              {
+                name: 'update',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'TagsUpdateWithWhereUniqueInput'
+                  }
+                }
               }
             ]
           },
@@ -536,6 +546,19 @@ describe('buildVariables', () => {
                     ofType: {
                       kind: TypeKind.INPUT_OBJECT,
                       name: 'RelatedPostCreateInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'update',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'RelatedPostUpdateWithWhereUniqueInput'
                     }
                   }
                 }
@@ -659,6 +682,39 @@ describe('buildVariables', () => {
                 }
               }
             ]
+          },
+          {
+            name: 'TagsUpdateWithWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'where',
+                type: {
+                  kind: TypeKind.INPUT_OBJECT,
+                  name: 'TagWhereUniqueInput'
+                }
+              },
+              {
+                name: 'data',
+                type: {
+                  kind: TypeKind.INPUT_OBJECT,
+                  name: 'TagUpdateInput'
+                }
+              }
+            ]
+          },
+          {
+            name: 'TagUpdateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'code',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
           }
         ]
       };
@@ -667,7 +723,7 @@ describe('buildVariables', () => {
         data: {
           id: 'postId',
           tags: [
-            { id: 'tags1', code: 'tags1code' },
+            { id: 'tags1', code: 'tags1code', thisShouldBeRemoved: null },
             { id: 'tags2', code: 'tags2scode' }
           ],
           keywords: ['keyword1', 'keyword2'],
@@ -683,7 +739,7 @@ describe('buildVariables', () => {
           thumbnail: null
         },
         previousData: {
-          tags: [{ id: 'tags1' }, { id: 'tags3' }],
+          tags: [{ id: 'tags1' }, { id: 'tags3', thisShouldBeRemoved: null }],
           keywords: ['keyword1'],
           editor: { ref: 'editor2code', code: 'editor2name' },
           relatedPosts: [

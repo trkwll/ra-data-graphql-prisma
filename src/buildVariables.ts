@@ -122,7 +122,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
   };
 };
 
-const findInputFieldForType = (
+export const findInputFieldForType = (
   introspectionResults: IntrospectionResult,
   typeName: string,
   field: string
@@ -141,7 +141,7 @@ const findInputFieldForType = (
   return !!inputFieldType ? getFinalType(inputFieldType.type) : null;
 };
 
-const inputFieldExistsForType = (
+export const inputFieldExistsForType = (
   introspectionResults: IntrospectionResult,
   typeName: string,
   field: string
@@ -245,7 +245,13 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         fieldsToRemove,
         fieldsToUpdate,
         fieldsToCreate
-      } = computeFieldsToAddRemoveUpdate(previousData, data);
+      } = computeFieldsToAddRemoveUpdate(
+        previousData,
+        data,
+        introspectionResults,
+        inputType.name
+      );
+
       return {
         ...acc,
         data: {
@@ -425,7 +431,9 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
 
       const { fieldsToAdd, fieldsToCreate } = computeFieldsToAddRemoveUpdate(
         [],
-        data
+        data,
+        introspectionResults,
+        inputType.name
       );
 
       return {
