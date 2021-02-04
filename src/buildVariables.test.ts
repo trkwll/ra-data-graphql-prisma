@@ -302,8 +302,7 @@ describe('buildVariables', () => {
           relatedPostsIds: ['relatedPost1', 'relatedPost2'],
           relatedPosts: [
             { id: 'relatedPost1', name: 'postName1' },
-            { id: 'relatedPost2', name: 'postName2' },
-            { name: 'postName3', thisShouldBeRemoved: null }
+            { id: 'relatedPost2', name: 'postName2' }
           ]
         }
       };
@@ -325,9 +324,256 @@ describe('buildVariables', () => {
           keywords: { set: ['keyword1', 'keyword2'] },
           relatedPosts: {
             connect: [{ id: 'relatedPost1' }, { id: 'relatedPost2' }],
-            create: [{ name: 'postName3' }]
+            create: []
           },
           title: 'Foo'
+        }
+      });
+    });
+
+    it('creates LabTest values correctly', () => {
+      const introspectionResult = {
+        types: [
+          {
+            name: 'LabTest',
+            fields: [{ name: 'values' }]
+          },
+          {
+            name: 'LabTestCreateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'values',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueUpdateManyInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueUpdateManyInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'create',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueCreateInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueWhereUniqueInput'
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueCreateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'name',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueNameCreateOneInput'
+                  }
+                }
+              },
+              {
+                name: 'value',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'unit',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'unit_type',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueNameCreateOneInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'create',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueNameCreateInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueNameWhereUniqueInput'
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueNameCreateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'name',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueNameWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueUpdateWithWhereUniqueNestedInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'where',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueWhereUniqueInput'
+                  }
+                }
+              },
+              {
+                name: 'data',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueUpdateDataInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          }
+        ]
+      };
+
+      const params = {
+        data: {
+          values: [
+            {
+              name: { connect: { id: 'cbd' } },
+              value: '2',
+              unit: '%',
+              unit_type: 'total'
+            },
+            {
+              name: { connect: { id: 'thc' } },
+              value: '1',
+              unit: '%',
+              unit_type: 'total'
+            }
+          ]
+        }
+      };
+
+      expect(
+        buildVariables((introspectionResult as unknown) as IntrospectionResult)(
+          { type: { name: 'LabTest' } } as Resource,
+          CREATE,
+          params
+        )
+      ).toEqual({
+        data: {
+          values: {
+            connect: [],
+            create: [
+              {
+                name: { connect: { id: 'cbd' } },
+                value: '2',
+                unit: '%',
+                unit_type: 'total'
+              },
+              {
+                name: { connect: { id: 'thc' } },
+                value: '1',
+                unit: '%',
+                unit_type: 'total'
+              }
+            ]
+          }
         }
       });
     });
@@ -732,8 +978,7 @@ describe('buildVariables', () => {
           relatedPostsIds: ['relatedPost1', 'relatedPost2'],
           relatedPosts: [
             { id: 'relatedPost1', name: 'postName1' },
-            { id: 'relatedPost2', name: 'postName2' },
-            { name: 'postName4' }
+            { id: 'relatedPost2', name: 'postName2' }
           ],
           title: 'Foo',
           thumbnail: null
@@ -765,17 +1010,15 @@ describe('buildVariables', () => {
           tags: {
             connect: [{ id: 'tags2' }],
             disconnect: [{ id: 'tags3' }],
-            update: [{ where: { id: 'tags1' }, data: { code: 'tags1code' } }],
+            update: [],
             create: []
           },
           keywords: { set: ['keyword1', 'keyword2'] },
           relatedPosts: {
             connect: [{ id: 'relatedPost2' }],
             disconnect: [{ id: 'relatedPost3' }],
-            update: [
-              { where: { id: 'relatedPost1' }, data: { name: 'postName1' } }
-            ],
-            create: [{ name: 'postName4' }]
+            update: [],
+            create: []
           },
           title: 'Foo',
           thumbnail: { disconnect: true }
@@ -875,6 +1118,334 @@ describe('buildVariables', () => {
           name: 'John Smith',
           meta: {
             update: { bio: 'foobar', dob: '1993-01-01' }
+          }
+        }
+      });
+    });
+
+    it('updates LabTest values correctly', () => {
+      const introspectionResult = {
+        types: [
+          {
+            name: 'LabTest',
+            fields: [{ name: 'values' }]
+          },
+          {
+            name: 'LabTestUpdateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'values',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueUpdateManyInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueUpdateManyInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'create',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueCreateInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'update',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueUpdateWithWhereUniqueNestedInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueWhereUniqueInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'disconnect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueWhereUniqueInput'
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueCreateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'name',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueNameCreateOneInput'
+                  }
+                }
+              },
+              {
+                name: 'value',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'unit',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'unit_type',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueUpdateDataInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'name',
+                type: {
+                  kind: TypeKind.INPUT_OBJECT,
+                  name: 'LabTestValueNameCreateOneInput'
+                }
+              },
+              {
+                name: 'value',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'unit',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              },
+              {
+                name: 'unit_type',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  type: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueNameCreateOneInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'create',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueNameCreateInput'
+                    }
+                  }
+                }
+              },
+              {
+                name: 'connect',
+                type: {
+                  kind: TypeKind.LIST,
+                  ofType: {
+                    kind: TypeKind.NON_NULL,
+                    ofType: {
+                      kind: TypeKind.INPUT_OBJECT,
+                      name: 'LabTestValueNameWhereUniqueInput'
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueNameCreateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'name',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueNameWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueUpdateWithWhereUniqueNestedInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'where',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueWhereUniqueInput'
+                  }
+                }
+              },
+              {
+                name: 'data',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'LabTestValueUpdateDataInput'
+                  }
+                }
+              }
+            ]
+          },
+          {
+            name: 'LabTestValueWhereUniqueInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'id',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String'
+                }
+              }
+            ]
+          }
+        ]
+      };
+
+      const params = {
+        data: {
+          id: 'labTest1',
+          values: [
+            {
+              id: 'labTestValue1',
+              name: { connect: { id: 'cbd' } },
+              value: '2',
+              unit: '%',
+              unit_type: 'total'
+            },
+            {
+              name: { connect: { id: 'thc' } },
+              value: '1',
+              unit: '%',
+              unit_type: 'total'
+            }
+          ]
+        },
+        previousData: {
+          id: 'labTest1',
+          values: [
+            {
+              id: 'labTestValue1',
+              name: { connect: { id: 'cbd' } },
+              value: '1',
+              unit: '%',
+              unit_type: 'total'
+            }
+          ]
+        }
+      };
+
+      expect(
+        buildVariables((introspectionResult as unknown) as IntrospectionResult)(
+          { type: { name: 'LabTest' } } as Resource,
+          UPDATE,
+          params
+        )
+      ).toEqual({
+        where: { id: 'labTest1' },
+        data: {
+          values: {
+            connect: [],
+            disconnect: [],
+            update: [
+              {
+                where: { id: 'labTestValue1' },
+                data: {
+                  name: { connect: { id: 'cbd' } },
+                  value: '2',
+                  unit: '%',
+                  unit_type: 'total'
+                }
+              }
+            ],
+            create: [
+              {
+                name: { connect: { id: 'thc' } },
+                value: '1',
+                unit: '%',
+                unit_type: 'total'
+              }
+            ]
           }
         }
       });

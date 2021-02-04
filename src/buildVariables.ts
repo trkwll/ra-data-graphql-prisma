@@ -259,8 +259,10 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           [key]: {
             [PRISMA_CONNECT]: fieldsToAdd,
             [PRISMA_DISCONNECT]: fieldsToRemove,
-            [PRISMA_UPDATE]: fieldsToUpdate,
-            [PRISMA_CREATE]: fieldsToCreate
+            [PRISMA_UPDATE]:
+              resource.type.name === 'LabTest' ? fieldsToUpdate : [],
+            [PRISMA_CREATE]:
+              resource.type.name === 'LabTest' ? fieldsToCreate : []
           }
         }
       };
@@ -442,7 +444,8 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc.data,
           [key]: {
             [PRISMA_CONNECT]: fieldsToAdd,
-            [PRISMA_CREATE]: fieldsToCreate
+            [PRISMA_CREATE]:
+              resource.type.name === 'LabTest' ? fieldsToCreate : []
           }
         }
       };
