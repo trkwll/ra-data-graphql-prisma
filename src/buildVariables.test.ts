@@ -1474,7 +1474,8 @@ describe('buildVariables', () => {
     it('returns correct variables', () => {
       const params = {
         target: 'author.id',
-        id: 'author1'
+        id: 'author1',
+        sort: { field: 'name', order: 'ASC' }
       };
 
       expect(
@@ -1484,7 +1485,8 @@ describe('buildVariables', () => {
           params
         )
       ).toEqual({
-        where: { author: { id: 'author1' } }
+        where: { author: { id: 'author1' } },
+        orderBy: 'name_ASC'
       });
     });
   });

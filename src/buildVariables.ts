@@ -524,7 +524,8 @@ export default (introspectionResults: IntrospectionResult) => (
       const parts = params.target.split('.');
 
       return {
-        where: { [parts[0]]: { id: params.id } }
+        where: { [parts[0]]: { id: params.id } },
+        orderBy: `${params.sort.field}_${params.sort.order}`
       };
     }
     case GET_ONE:
