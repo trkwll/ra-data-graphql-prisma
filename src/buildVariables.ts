@@ -252,6 +252,10 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         inputType.name
       );
 
+      const shouldUpdateOrCreate = ['LabTest', 'Batch'].includes(
+        resource.type.name
+      );
+
       return {
         ...acc,
         data: {
@@ -259,10 +263,8 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           [key]: {
             [PRISMA_CONNECT]: fieldsToAdd,
             [PRISMA_DISCONNECT]: fieldsToRemove,
-            [PRISMA_UPDATE]:
-              resource.type.name === 'LabTest' ? fieldsToUpdate : [],
-            [PRISMA_CREATE]:
-              resource.type.name === 'LabTest' ? fieldsToCreate : []
+            [PRISMA_UPDATE]: shouldUpdateOrCreate ? fieldsToUpdate : [],
+            [PRISMA_CREATE]: shouldUpdateOrCreate ? fieldsToCreate : []
           }
         }
       };
@@ -295,6 +297,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
+      console.log(key, resource.type.name);
       const fieldsToUpdate = buildReferenceField({
         inputArg: data,
         introspectionResults,
@@ -438,14 +441,15 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         inputType.name
       );
 
+      const shouldCreate = ['LabTest', 'Batch'].includes(resource.type.name);
+
       return {
         ...acc,
         data: {
           ...acc.data,
           [key]: {
             [PRISMA_CONNECT]: fieldsToAdd,
-            [PRISMA_CREATE]:
-              resource.type.name === 'LabTest' ? fieldsToCreate : []
+            [PRISMA_CREATE]: shouldCreate ? fieldsToCreate : []
           }
         }
       };
