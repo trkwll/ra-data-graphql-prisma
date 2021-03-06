@@ -252,7 +252,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         inputType.name
       );
 
-      const shouldUpdateOrCreate = ['LabTest', 'Batch'].includes(
+      const shouldUpdateOrCreate = ['LabTest', 'Batch', 'Brand'].includes(
         resource.type.name
       );
 
@@ -297,7 +297,6 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
-      console.log(key, resource.type.name);
       const fieldsToUpdate = buildReferenceField({
         inputArg: data,
         introspectionResults,
@@ -441,7 +440,9 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         inputType.name
       );
 
-      const shouldCreate = ['LabTest', 'Batch'].includes(resource.type.name);
+      const shouldCreate = ['LabTest', 'Batch', 'Brand'].includes(
+        resource.type.name
+      );
 
       return {
         ...acc,
