@@ -69,15 +69,20 @@ export default (options: {
         }
 
         if (fetchType === UPDATE_MANY) {
-          const { ids, data, ...otherParams } = params;
+          const { ids, data, previousData = {}, ...otherParams } = params;
           return Promise.all(
-            params.ids.map((id: string) =>
-              graphQLDataProvider(UPDATE, resource, {
+            params.ids.map((id: string) => {
+              const previousDataWithDefaultValues = Object.keys(data).reduce(
+                (acc, key) => ({ ...acc, [key]: previousData[key] || null }),
+                { id }
+              );
+              return graphQLDataProvider(UPDATE, resource, {
                 id,
                 data: { id, ...data },
+                previousData: previousDataWithDefaultValues,
                 ...otherParams
-              })
-            )
+              });
+            })
           ).then(results => {
             return { data: results.map(({ data }: any) => data.id) };
           });
