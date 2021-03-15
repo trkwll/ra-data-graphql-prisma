@@ -984,6 +984,9 @@ describe('buildVariables', () => {
           thumbnail: null
         },
         previousData: {
+          id: 'postId',
+          title: 'Foo',
+          author: { id: 'author1', name: 'author1name' },
           tags: [{ id: 'tags1' }, { id: 'tags3', thisShouldBeRemoved: null }],
           keywords: ['keyword1'],
           editor: { ref: 'editor2code', code: 'editor2name' },
@@ -1102,7 +1105,7 @@ describe('buildVariables', () => {
         previousData: {
           id: 'user1',
           name: 'John',
-          meta: { id: 'userMeta1' }
+          meta: { id: 'userMeta1', bio: null, dob: null }
         }
       };
 
