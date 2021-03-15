@@ -114,6 +114,19 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     return { ...acc, [key]: params.filter[key] };
   }, {});
 
+  const type = introspectionResults.types.find(
+    t => t.name === `${resource.type.name}WhereInput`
+  ) as IntrospectionInputObjectType;
+  const statusNotField = type.inputFields.find(t => t.name === 'status_not');
+  if (!filter['status'] && statusNotField) {
+    const statusNotFieldType = statusNotField.type as IntrospectionNamedTypeRef;
+    if (statusNotFieldType.name === 'ResourceStatus') {
+      filter['status_not'] = 'TRASH';
+    } else if (statusNotFieldType.name === 'UserStatus') {
+      filter['status_not'] = 'DEACTIVE';
+    }
+  }
+
   return {
     skip: (params.pagination.page - 1) * params.pagination.perPage,
     first: params.pagination.perPage,

@@ -51,6 +51,80 @@ describe('buildVariables', () => {
         skip: 90
       });
     });
+
+    it('should filter out elements whose status=TRASH', () => {
+      const introspectionResult = {
+        types: [
+          {
+            kind: 'INPUT_OBJECT',
+            name: 'PostWhereInput',
+            inputFields: [
+              {
+                name: 'status_not',
+                type: { kind: 'ENUM', name: 'ResourceStatus' }
+              }
+            ]
+          }
+        ]
+      };
+      const params = {
+        filter: {},
+        pagination: { page: 10, perPage: 10 },
+        sort: { field: 'sortField', order: 'DESC' }
+      };
+
+      expect(
+        buildVariables((introspectionResult as unknown) as IntrospectionResult)(
+          { type: { name: 'Post' } } as Resource,
+          GET_LIST,
+          params
+        )
+      ).toEqual({
+        where: {
+          status_not: 'TRASH'
+        },
+        first: 10,
+        orderBy: 'sortField_DESC',
+        skip: 90
+      });
+    });
+
+    it('should filter out users whose status=DEACTIVE', () => {
+      const introspectionResult = {
+        types: [
+          {
+            kind: 'INPUT_OBJECT',
+            name: 'UserWhereInput',
+            inputFields: [
+              {
+                name: 'status_not',
+                type: { kind: 'ENUM', name: 'UserStatus' }
+              }
+            ]
+          }
+        ]
+      };
+      const params = {
+        filter: {},
+        pagination: { page: 10, perPage: 10 },
+        sort: { field: 'sortField', order: 'DESC' }
+      };
+
+      expect(
+        buildVariables((introspectionResult as unknown) as IntrospectionResult)(
+          { type: { name: 'User' } } as Resource,
+          GET_LIST,
+          params
+        )
+      ).toEqual({
+        where: {
+          status_not: 'DEACTIVE'
+        },
+        first: 10,
+        orderBy: 'sortField_DESC',
+        skip: 90
+      });
+    });
   });
 
   describe('CREATE', () => {
