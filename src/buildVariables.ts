@@ -213,11 +213,11 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
     let data = params.data[key];
     let previousData = params.previousData[key];
 
-    if (typeof previousData === 'undefined') {
-      return acc;
-    }
-
     if (Array.isArray(data)) {
+      if (typeof previousData === 'undefined') {
+        return acc;
+      }
+
       // if key finish with Ids, its an array of relation
       if (/Ids$/.test(key)) {
         previousData = params.previousData[key].map((id: string) => ({ id }));
