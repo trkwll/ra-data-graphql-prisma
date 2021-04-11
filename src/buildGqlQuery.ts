@@ -199,6 +199,38 @@ export default (introspectionResults: IntrospectionResult) => (
       );
 
   if (
+    aorFetchType === GET_LIST &&
+    resource.type.name === 'Product' &&
+    variables.has_duplicate
+  ) {
+    return gqlTypes.document([
+      gqlTypes.operationDefinition(
+        'query',
+        gqlTypes.selectionSet([
+          gqlTypes.field(gqlTypes.name('productSearch'), {
+            alias: gqlTypes.name('items'),
+            arguments: args,
+            selectionSet: gqlTypes.selectionSet(fields)
+          })
+          // gqlTypes.field(gqlTypes.name(`${queryType.name}Connection`), {
+          //   alias: gqlTypes.name('total'),
+          //   arguments: countArgs,
+          //   selectionSet: gqlTypes.selectionSet([
+          //     gqlTypes.field(gqlTypes.name('aggregate'), {
+          //       selectionSet: gqlTypes.selectionSet([
+          //         gqlTypes.field(gqlTypes.name('count'))
+          //       ])
+          //     })
+          //   ])
+          // })
+        ]),
+        gqlTypes.name('productSearch'),
+        apolloArgs
+      )
+    ]);
+  }
+
+  if (
     aorFetchType === GET_LIST ||
     aorFetchType === GET_MANY ||
     aorFetchType === GET_MANY_REFERENCE

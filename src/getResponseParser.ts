@@ -47,9 +47,10 @@ const sanitizeResource = (
           ? data[field.name].id
           : undefined,
         [field.name]: linkedResourceData
-          ? sanitizeResource(introspectionResults, linkedResource)(
-            data[field.name]
-          )
+          ? sanitizeResource(
+              introspectionResults,
+              linkedResource
+            )(data[field.name])
           : undefined
       };
     }
@@ -72,7 +73,9 @@ export default (introspectionResults: IntrospectionResult) => (
   ) {
     return {
       data: response.data.items.map(sanitize),
-      total: response.data.total.aggregate.count
+      total: response.data.total
+        ? response.data.total.aggregate.count
+        : response.data.items.length
     };
   }
 

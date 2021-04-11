@@ -127,12 +127,20 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     }
   }
 
-  return {
+  const variables = {
     skip: (params.pagination.page - 1) * params.pagination.perPage,
     first: params.pagination.perPage,
-    orderBy: `${params.sort.field}_${params.sort.order}`,
-    where: filter
+    orderBy: `${params.sort.field}_${params.sort.order}`
   };
+
+  if (resource.type.name === 'Product' && filter['has_duplicate']) {
+    delete filter['has_duplicate'];
+    variables['has_duplicate'] = true;
+  }
+
+  variables['where'] = filter;
+
+  return variables;
 };
 
 export const findInputFieldForType = (
