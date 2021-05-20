@@ -24,57 +24,57 @@ export interface Query {
   args: IntrospectionField[];
 }
 
-export const buildFields = (introspectionResults: IntrospectionResult) => (
-  fields: ReadonlyArray<IntrospectionField>
-): FieldNode[] => {
-  return fields.reduce((acc: FieldNode[], field) => {
-    const type = getFinalType(field.type);
+export const buildFields =
+  (introspectionResults: IntrospectionResult) =>
+  (fields: ReadonlyArray<IntrospectionField>): FieldNode[] => {
+    return fields.reduce((acc: FieldNode[], field) => {
+      const type = getFinalType(field.type);
 
-    if (type.name.startsWith('_')) {
-      return acc;
-    }
+      if (type.name.startsWith('_')) {
+        return acc;
+      }
 
-    if (type.kind !== TypeKind.OBJECT) {
-      return [...acc, gqlTypes.field(gqlTypes.name(field.name))];
-    }
+      if (type.kind !== TypeKind.OBJECT) {
+        return [...acc, gqlTypes.field(gqlTypes.name(field.name))];
+      }
 
-    const linkedResource = introspectionResults.resources.find(
-      r => r.type.name === type.name
-    );
+      const linkedResource = introspectionResults.resources.find(
+        r => r.type.name === type.name
+      );
 
-    if (linkedResource) {
-      return [
-        ...acc,
-        gqlTypes.field(gqlTypes.name(field.name), {
-          selectionSet: gqlTypes.selectionSet([
-            gqlTypes.field(gqlTypes.name('id'))
-          ])
-        })
-      ];
-    }
+      if (linkedResource) {
+        return [
+          ...acc,
+          gqlTypes.field(gqlTypes.name(field.name), {
+            selectionSet: gqlTypes.selectionSet([
+              gqlTypes.field(gqlTypes.name('id'))
+            ])
+          })
+        ];
+      }
 
-    const linkedType = introspectionResults.types.find(
-      t => t.name === type.name
-    );
+      const linkedType = introspectionResults.types.find(
+        t => t.name === type.name
+      );
 
-    if (linkedType) {
-      return [
-        ...acc,
-        gqlTypes.field(gqlTypes.name(field.name), {
-          selectionSet: gqlTypes.selectionSet(
-            buildFields(introspectionResults)(
-              (linkedType as IntrospectionObjectType).fields
+      if (linkedType) {
+        return [
+          ...acc,
+          gqlTypes.field(gqlTypes.name(field.name), {
+            selectionSet: gqlTypes.selectionSet(
+              buildFields(introspectionResults)(
+                (linkedType as IntrospectionObjectType).fields
+              )
             )
-          )
-        })
-      ];
-    }
+          })
+        ];
+      }
 
-    // NOTE: We might have to handle linked types which are not resources but will have to be careful about
-    // ending with endless circular dependencies
-    return acc;
-  }, [] as FieldNode[]);
-};
+      // NOTE: We might have to handle linked types which are not resources but will have to be careful about
+      // ending with endless circular dependencies
+      return acc;
+    }, [] as FieldNode[]);
+  };
 
 export const getArgType = (arg: IntrospectionField) => {
   const type = getFinalType(arg.type);
@@ -181,118 +181,123 @@ const buildFieldsFromFragment = (
   return (parsedFragment as any).definitions[0].selectionSet.selections;
 };
 
-export default (introspectionResults: IntrospectionResult) => (
-  resource: Resource,
-  aorFetchType: string,
-  queryType: Query,
-  variables: { [key: string]: any },
-  fragment: DocumentNode
-) => {
-  const { orderBy, skip, first, ...countVariables } = variables;
-  const apolloArgs = buildApolloArgs(queryType, variables);
-  const args = buildArgs(queryType, variables);
-  const countArgs = buildArgs(queryType, countVariables);
-  const fields = !!fragment
-    ? buildFieldsFromFragment(fragment, resource.type.name, aorFetchType)
-    : buildFields(introspectionResults)(
-        (resource.type as IntrospectionObjectType).fields
+export default (introspectionResults: IntrospectionResult) =>
+  (
+    resource: Resource,
+    aorFetchType: string,
+    queryType: Query,
+    variables: { [key: string]: any },
+    fragment: DocumentNode
+  ) => {
+    let finalQueryType: any = queryType;
+
+    if (
+      aorFetchType === GET_LIST &&
+      resource.type.name === 'Product' &&
+      variables.has_duplicate
+    ) {
+      finalQueryType = introspectionResults.queries.find(
+        r => r.name === 'productSearch'
       );
+    }
 
-  if (
-    aorFetchType === GET_LIST &&
-    resource.type.name === 'Product' &&
-    variables.has_duplicate
-  ) {
+    const { orderBy, skip, first, ...countVariables } = variables;
+    const apolloArgs = buildApolloArgs(finalQueryType, variables);
+    const args = buildArgs(finalQueryType, variables);
+    const countArgs = buildArgs(finalQueryType, countVariables);
+    const fields = !!fragment
+      ? buildFieldsFromFragment(fragment, resource.type.name, aorFetchType)
+      : buildFields(introspectionResults)(
+          (resource.type as IntrospectionObjectType).fields
+        );
+
+    if (finalQueryType.name === 'productSearch') {
+      return gqlTypes.document([
+        gqlTypes.operationDefinition(
+          'query',
+          gqlTypes.selectionSet([
+            gqlTypes.field(gqlTypes.name('productSearch'), {
+              alias: gqlTypes.name('items'),
+              arguments: args,
+              selectionSet: gqlTypes.selectionSet(fields)
+            }),
+            gqlTypes.field(gqlTypes.name('productSearch'), {
+              alias: gqlTypes.name('count'),
+              arguments: countArgs,
+              selectionSet: gqlTypes.selectionSet([
+                gqlTypes.field(gqlTypes.name('id'))
+              ])
+            })
+          ]),
+          gqlTypes.name('productSearch'),
+          apolloArgs
+        )
+      ]);
+    }
+
+    if (
+      aorFetchType === GET_LIST ||
+      aorFetchType === GET_MANY ||
+      aorFetchType === GET_MANY_REFERENCE
+    ) {
+      return gqlTypes.document([
+        gqlTypes.operationDefinition(
+          'query',
+          gqlTypes.selectionSet([
+            gqlTypes.field(gqlTypes.name(queryType.name!), {
+              alias: gqlTypes.name('items'),
+              arguments: args,
+              selectionSet: gqlTypes.selectionSet(fields)
+            }),
+            gqlTypes.field(gqlTypes.name(`${queryType.name}Connection`), {
+              alias: gqlTypes.name('total'),
+              arguments: countArgs,
+              selectionSet: gqlTypes.selectionSet([
+                gqlTypes.field(gqlTypes.name('aggregate'), {
+                  selectionSet: gqlTypes.selectionSet([
+                    gqlTypes.field(gqlTypes.name('count'))
+                  ])
+                })
+              ])
+            })
+          ]),
+          gqlTypes.name(queryType.name!),
+          apolloArgs
+        )
+      ]);
+    }
+
+    if (aorFetchType === DELETE) {
+      return gqlTypes.document([
+        gqlTypes.operationDefinition(
+          'mutation',
+          gqlTypes.selectionSet([
+            gqlTypes.field(gqlTypes.name(queryType.name!), {
+              alias: gqlTypes.name('data'),
+              arguments: args,
+              selectionSet: gqlTypes.selectionSet([
+                gqlTypes.field(gqlTypes.name('id'))
+              ])
+            })
+          ]),
+          gqlTypes.name(queryType.name!),
+          apolloArgs
+        )
+      ]);
+    }
+
     return gqlTypes.document([
       gqlTypes.operationDefinition(
-        'query',
-        gqlTypes.selectionSet([
-          gqlTypes.field(gqlTypes.name('productSearch'), {
-            alias: gqlTypes.name('items'),
-            arguments: args,
-            selectionSet: gqlTypes.selectionSet(fields)
-          })
-          // gqlTypes.field(gqlTypes.name(`${queryType.name}Connection`), {
-          //   alias: gqlTypes.name('total'),
-          //   arguments: countArgs,
-          //   selectionSet: gqlTypes.selectionSet([
-          //     gqlTypes.field(gqlTypes.name('aggregate'), {
-          //       selectionSet: gqlTypes.selectionSet([
-          //         gqlTypes.field(gqlTypes.name('count'))
-          //       ])
-          //     })
-          //   ])
-          // })
-        ]),
-        gqlTypes.name('productSearch'),
-        apolloArgs
-      )
-    ]);
-  }
-
-  if (
-    aorFetchType === GET_LIST ||
-    aorFetchType === GET_MANY ||
-    aorFetchType === GET_MANY_REFERENCE
-  ) {
-    return gqlTypes.document([
-      gqlTypes.operationDefinition(
-        'query',
-        gqlTypes.selectionSet([
-          gqlTypes.field(gqlTypes.name(queryType.name!), {
-            alias: gqlTypes.name('items'),
-            arguments: args,
-            selectionSet: gqlTypes.selectionSet(fields)
-          }),
-          gqlTypes.field(gqlTypes.name(`${queryType.name}Connection`), {
-            alias: gqlTypes.name('total'),
-            arguments: countArgs,
-            selectionSet: gqlTypes.selectionSet([
-              gqlTypes.field(gqlTypes.name('aggregate'), {
-                selectionSet: gqlTypes.selectionSet([
-                  gqlTypes.field(gqlTypes.name('count'))
-                ])
-              })
-            ])
-          })
-        ]),
-        gqlTypes.name(queryType.name!),
-        apolloArgs
-      )
-    ]);
-  }
-
-  if (aorFetchType === DELETE) {
-    return gqlTypes.document([
-      gqlTypes.operationDefinition(
-        'mutation',
+        QUERY_TYPES.includes(aorFetchType) ? 'query' : 'mutation',
         gqlTypes.selectionSet([
           gqlTypes.field(gqlTypes.name(queryType.name!), {
             alias: gqlTypes.name('data'),
             arguments: args,
-            selectionSet: gqlTypes.selectionSet([
-              gqlTypes.field(gqlTypes.name('id'))
-            ])
+            selectionSet: gqlTypes.selectionSet(fields)
           })
         ]),
         gqlTypes.name(queryType.name!),
         apolloArgs
       )
     ]);
-  }
-
-  return gqlTypes.document([
-    gqlTypes.operationDefinition(
-      QUERY_TYPES.includes(aorFetchType) ? 'query' : 'mutation',
-      gqlTypes.selectionSet([
-        gqlTypes.field(gqlTypes.name(queryType.name!), {
-          alias: gqlTypes.name('data'),
-          arguments: args,
-          selectionSet: gqlTypes.selectionSet(fields)
-        })
-      ]),
-      gqlTypes.name(queryType.name!),
-      apolloArgs
-    )
-  ]);
-};
+  };
