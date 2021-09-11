@@ -32,8 +32,18 @@ const defaultOptions = {
         `${pluralize(camelCase(resource.name))}`,
       [GET_MANY_REFERENCE]: (resource: Resource) =>
         `${pluralize(camelCase(resource.name))}`,
-      [CREATE]: (resource: Resource) => `create${resource.name}`,
-      [UPDATE]: (resource: Resource) => `update${resource.name}`,
+      [CREATE]: (resource: Resource) => {
+        if (resource.name === 'ProductType') {
+          return 'create_product_type';
+        }
+        return `create${resource.name}`;
+      },
+      [UPDATE]: (resource: Resource) => {
+        if (resource.name === 'ProductType') {
+          return 'update_product_type';
+        }
+        return `update${resource.name}`;
+      },
       [DELETE]: (resource: Resource) => `delete${resource.name}`
     },
     exclude: undefined,
