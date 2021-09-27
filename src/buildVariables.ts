@@ -393,8 +393,21 @@ const buildUpdateVariables =
       const newData = { ...result.data, id: result.where.id };
       delete newData['sub_type'];
       delete newData['consumption_methods'];
+
       newData['sub_types'] = params.data.sub_typeIds;
+      const previousSubtypeIds = params.previousData.sub_typeIds || [];
+      newData['sub_types_to_delete'] = previousSubtypeIds.filter(
+        (id: any) => !newData['sub_types'].includes(id)
+      );
+
       newData['consumption_methods'] = params.data.consumption_methodsIds;
+      const previousConsumptionMethodIds =
+        params.previousData.consumption_methodsIds || [];
+      newData['consumption_methods_to_delete'] =
+        previousConsumptionMethodIds.filter(
+          (id: any) => !newData['consumption_methods'].includes(id)
+        );
+
       return { data: newData };
     }
 
