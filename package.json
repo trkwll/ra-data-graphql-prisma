@@ -1,6 +1,6 @@
 {
   "name": "@trkwll/ra-data-graphql-prisma",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "description": "A react-admin data provider for Prisma Server",
   "main": "dist/index.js",
   "sideEffects": false,
@@ -32,6 +32,7 @@
   ],
   "license": "UNLICENSED",
   "scripts": {
+    "prepublish": "yarn build",
     "build": "tsc",
     "watch": "tsc --watch",
     "test": "jest"
