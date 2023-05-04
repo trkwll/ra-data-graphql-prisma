@@ -197,7 +197,7 @@ export default (introspectionResults: IntrospectionResult) =>
       variables.has_duplicate
     ) {
       finalQueryType = introspectionResults.queries.find(
-        r => r.name === 'products'
+        r => r.name === 'productSearch'
       );
     }
 
@@ -211,17 +211,17 @@ export default (introspectionResults: IntrospectionResult) =>
           (resource.type as IntrospectionObjectType).fields
         );
 
-    if (finalQueryType.name === 'products') {
+    if (finalQueryType.name === 'productSearch') {
       return gqlTypes.document([
         gqlTypes.operationDefinition(
           'query',
           gqlTypes.selectionSet([
-            gqlTypes.field(gqlTypes.name('products'), {
+            gqlTypes.field(gqlTypes.name('productSearch'), {
               alias: gqlTypes.name('items'),
               arguments: args,
               selectionSet: gqlTypes.selectionSet(fields)
             }),
-            gqlTypes.field(gqlTypes.name('products'), {
+            gqlTypes.field(gqlTypes.name('productSearch'), {
               alias: gqlTypes.name('count'),
               arguments: countArgs,
               selectionSet: gqlTypes.selectionSet([
@@ -229,7 +229,7 @@ export default (introspectionResults: IntrospectionResult) =>
               ])
             })
           ]),
-          gqlTypes.name('products'),
+          gqlTypes.name('productSearch'),
           apolloArgs
         )
       ]);
